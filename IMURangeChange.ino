@@ -13,7 +13,7 @@ void setup() {
   Wire.begin();
 
   if (!imu.init()) {
-    Serial.println("shit ain't working");
+    Serial.println("this ain't working");
   imu.enableDefault();
   imu.writeReg(LSM6::CTRL3_C, 0x44);
   }
