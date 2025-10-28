@@ -147,6 +147,8 @@ void setup() {
 
   //Alt IMU Initialization
   imu.enableDefault();
+  imu.writeReg(LSM6::CTRL3_C, 0x44);
+  imu.writeReg(LSM6::CTRL1_XL, 0x64);
   mag.enableDefault();
   ps.enableDefault();
 
@@ -232,7 +234,7 @@ void loop() {
 
   // Update LEDs
   updateFlightLED(State);                 // Update flight LED
-  //updateErrorLED();                              // Update error LED
+  updateErrorLED();                              // Update error LED
 
   //Update Variables
   lastVel = vel;
@@ -323,7 +325,7 @@ void readSensors(){
   temp=bmp.temperature;
 
   //Read Acceleration
-  ax= imu.a.x; ay= imu.a.y; az= imu.a.z;
+  ax= imu.a.x * 0.000488f; ay= imu.a.y * 0.000488f; az= imu.a.z * 0.000488f;
 
   //Read Compass
   heading=headingCalculation(mag.m.x,mag.m.y,mag.m.z,pitch,roll);
@@ -471,24 +473,7 @@ void updateFlightLED(FlightState state){
 void updateErrorLED(){
   if (!SD.begin(SD_PIN) || !bmp.begin_I2C() || !imu.init() || !mag.init() || !ps.init() || !gps.begin(0x10)){
     blinkLED(FLIGHT_LED, CRGB::Red, errorLedState, errorLedLastToggle, 500);
-    if(!SD.begin(SD_PIN)){
-      Serial.print("SD Error");
-    }
-    else if(!bmp.begin_I2C()){
-      Serial.print("BMP Error");
-    }
-    else if(!imu.init()){
-      Serial.print("IMU Error");
-    }
-    else if(!mag.init()){
-      Serial.print("Mag Error");
-    }
-    else if(!ps.init()){
-      Serial.print("LPS Error");
-    }
-    else if(!gps.begin(0x10)){
-      Serial.print("GPS Error");
-    }
+    Serial.println("Sensor Error")
   }
   else{
     leds[ERROR_LED] = CRGB::Black; 
